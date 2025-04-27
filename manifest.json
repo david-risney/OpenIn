@@ -14,7 +14,8 @@
         "https://dev.azure.com/microsoft/Edge/*",
         "https://source.chromium.org/chromium/*",
         "https://issues.chromium.org/*",
-        "https://chromium-review.googlesource.com/*"
+        "https://chromium-review.googlesource.com/*",
+        "https://source.chromium.org/*"
       ],
       "js": ["src/content/content.js"]
     }

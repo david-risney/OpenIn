@@ -42,6 +42,20 @@ const mapping = {
             "groupSelectors": ["gr-app#pg-app", "gr-app-element#app-element", "gr-diff-view", "gr-dropdown-list#dropdown", "gr-button.dropdown-trigger"],
             "remotePathSelector": "span#triggerText",
             "remotePathValuePath": {"kind": "textContent"}
+        },
+    ],
+    "source.chromium.org": [
+        {
+            "title": "Google Code search results list",
+            "groupSelectors": [".result-path"],
+            "remotePathSelector": "div",
+            "remotePathValuePath": {"kind": "textContent"}
+        },
+        {
+            "title": "Google Code search result page",
+            "groupSelectors": ["#skiplink-navigation-target"],
+            "remotePathSelector": null,
+            "remotePathValuePath": {"kind": "textContent"}
         }
     ]
 }
@@ -60,7 +74,10 @@ function getSourceFiles() {
             groups.forEach(group => {
                 function getRemotePathValue() {
                     let remotePathValue = null;
-                    const remotePath = group.querySelector(currentMapping.remotePathSelector);
+                    let remotePath = group;
+                    if (currentMapping.remotePathSelector) {
+                        remotePath = group.querySelector(currentMapping.remotePathSelector);
+                    }
                     if (remotePath) {
                         switch (currentMapping.remotePathValuePath.kind) {
                             case "textContent":
