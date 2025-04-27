@@ -16,3 +16,5 @@ dist/
 
 # Test coverage
 coverage/
+
+web-ext-artifacts/

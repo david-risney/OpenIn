@@ -4,7 +4,6 @@ module.exports = {
   entry: {
     background: './src/background/background.js',
     content: './src/content/content.js',
-    popup: './src/popup/popup.js',
     options: './src/options/options.js'
   },
   output: {

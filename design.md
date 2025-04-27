@@ -35,12 +35,8 @@ OpenIn/
 │   │   └── options.css         # CSS for the options/settings page
 │   └── utils/
 │       └── uriMapper.js        # Utility for mapping URIs to local paths
-├── dist/                       # Compiled extension files
-├── tests/
-│   ├── content.test.js         # Unit tests for content script
-│   └── utils.test.js           # Unit tests for utilities
+├── tests/                      # Unit tests
 ├── manifest.json               # Extension manifest file
-├── webpack.config.js           # Webpack configuration
 ├── package.json                # NPM package configuration
 ├── .eslintrc.js                # ESLint configuration
 ├── .prettierrc                 # Prettier configuration
@@ -59,29 +55,23 @@ OpenIn/
    npm install
    ```
 
-2. **Build the Extension**:
-   ```bash
-   npm run build
-   ```
-   This will generate the compiled files in the `dist/` folder.
-
-3. **Run the Extension**:
+2. **Run the Extension**:
    - Open Chrome or Edge.
    - Navigate to `chrome://extensions/` or `edge://extensions/`.
    - Enable "Developer mode".
-   - Click "Load unpacked" and select the `dist/` folder.
+   - Click "Load unpacked" and select the `src/` folder.
 
-4. **Test the Extension**:
+3. **Test the Extension**:
    ```bash
    npm test
    ```
 
-5. **Lint the Code**:
+4. **Lint the Code**:
    ```bash
    npm run lint
    ```
 
-6. **Format the Code**:
+5. **Format the Code**:
    ```bash
    npm run format
    ```

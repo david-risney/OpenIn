@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <h1>Options</h1>
+  <form id="options-form">
+    <label for="local-root-path">Local Root File Path:</label>
+    <input type="text" id="local-root-path" placeholder="e.g., C:/Projects" />
+
+    <label for="custom-url-template">Custom URL Template:</label>
+    <input type="text" id="custom-url-template" placeholder="e.g., vscode://file/{localSourceFilePath}" />
+
+    <button type="submit">Save Options</button>
+  </form>
+  <script type="module" src="options.js"></script>
+</body>
+</html>
