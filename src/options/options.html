@@ -21,25 +21,27 @@
 </head>
 <body>
   <h1>Options</h1>
-  <form id="options-form">
-    <ol id="project-list"></ol>
 
-    <button type="button" id="add-project-button">Add Project</button>
-    <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
+  <h2>Projects</h2>
+  <ol id="project-list"></ol>
 
-    <label for="default-local-path">Default Local Path:</label>
-    <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
+  <button type="button" id="add-project-button">Add Project</button>
+  <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
+  <hr>
 
-    <label for="custom-url-template">Custom URL Template:</label>
-    <input type="text" id="custom-url-template" placeholder="e.g., vscode://file/{localSourceFilePath}" />
+  <h2>Defaults</h2>
 
-    <div>
-    <input type="checkbox" id="auto-open-single-file" checked />
-    <label for="auto-open-single-file">Auto Open Single File</label>
-    </div>
+  <label for="default-local-path">Default Local Path:</label>
+  <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
 
-    <button type="submit">Save Options</button>
-  </form>
+  <label for="custom-url-template">Custom URL Template:</label>
+  <input type="text" id="custom-url-template" placeholder="e.g., vscode://file/{localSourceFilePath}" />
+
+  <div>
+  <input type="checkbox" id="auto-open-single-file" checked />
+  <label for="auto-open-single-file">Auto Open Single File</label>
+  </div>
+  <button id="save-button" type="submit">Save</button>
   <script type="module" src="options.js"></script>
 </body>
 </html>

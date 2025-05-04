@@ -14,7 +14,7 @@ async function saveOptions(event) {
     await setSettings({ defaultLocalPath, customUrlTemplate, projects, autoOpenSingleFile });
     alert('Options saved successfully!');
 }
-document.getElementById('options-form').addEventListener('submit', saveOptions);
+document.getElementById('save-button').addEventListener('click', saveOptions);
 
 // projects is an array of project objects:
 // [ { project: 'Project Name', repo: 'Repo Name', localPath: 'C:/path/to/project1' } ]
