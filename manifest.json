@@ -15,7 +15,8 @@
         "https://source.chromium.org/chromium/*",
         "https://issues.chromium.org/*",
         "https://chromium-review.googlesource.com/*",
-        "https://source.chromium.org/*"
+        "https://source.chromium.org/*",
+        "https://github.com/*"
       ],
       "js": ["src/content/content.js"]
     }

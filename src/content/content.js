@@ -1,5 +1,6 @@
 // Example usage in content.js
 const console = window.console.context ? window.console.context('openin') : window.console;
+// const console = { log: () => {} }; // Disable logging
 console.log('Content script loaded');
 
 // Does a series of selectors with each one running on the results of the previous.
@@ -19,7 +20,7 @@ function querySelectorsAllFromElements(elements, selectors) {
 
         allFoundElements.push(...foundWithShadowRootElements);
 
-        // console.log(`Found ${foundWithShadowRootElements.length} elements for selector "${selector}" in element:`, element, foundWithShadowRootElements);
+        console.log(`Found ${foundWithShadowRootElements.length} elements for selector "${selector}" in element:`, element, foundWithShadowRootElements);
     });
 
     return querySelectorsAllFromElements(allFoundElements, selectors.slice(1));
@@ -91,14 +92,14 @@ const mapping = {
     "dev.azure.com": [
         {
             "title": {"literal": "Azure DevOps search results"},
-            "project": {"urlpattern": { "pathname": "/:project/*" }},
+            "project": {"urlpattern": { "pathname": "/:org/:project/*" }},
             "repo": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)" }},
             "remotePath": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)/[^/]+//(?<remotePath>.*)" }}
         },
         {
             "title": {"literal": "Azure DevOps file view"},
-            "project": {"urlpattern": { "pathname": "/:project/*" }},
-            "repo": {"urlpattern": { "pathname": "/:project/_git/:repo" }},
+            "project": {"urlpattern": { "pathname": "/:org/:project/*" }},
+            "repo": {"urlpattern": { "pathname": "/:org/:project/_git/:repo" }},
             "remotePath": {"urlquery": { "path": "/(?<remotePath>.*)" }}
         }
     ],
@@ -149,7 +150,7 @@ function getUrlQueryValue(valueName, urlQueryOptions) {
 
     const regex = new RegExp(urlQueryOptions[urlQueryKeyName]);
     const match = regex.exec(urlQueryKeyValue);
-    // console.log(`Parsing URL query with options:`, document.location.search, urlQueryOptions, urlQueryKeyName, urlQueryKeyValue, regex, match);
+    console.log(`Parsing URL query with options:`, document.location.search, urlQueryOptions, urlQueryKeyName, urlQueryKeyValue, regex, match);
     return (match && match.groups) ? decodeURI(match.groups[valueName]) : null;
 }
 
@@ -223,7 +224,7 @@ function getSourceFiles() {
                 };
             });
 
-            // console.log(`Found ${entries.length} source files for mapping:`, mapping, entries);
+            console.log(`Found ${entries.length} source files for mapping:`, mapping, entries);
 
             sourceFiles = sourceFiles.concat(entries);
         });
@@ -236,11 +237,11 @@ function getSourceFiles() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
         case 'getSourceFilePaths': {
-            // console.log('Received request for source file paths from background script');
+            console.log('Received request for source file paths from background script');
 
             const sourceFilePaths = getSourceFiles();
 
-            // console.log('Replying with source file paths:', sourceFilePaths);
+            console.log('Replying with source file paths:', sourceFilePaths);
 
             sendResponse({ sourceFilePaths });
             break;
