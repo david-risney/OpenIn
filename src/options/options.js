@@ -47,7 +47,7 @@ function projectListToHtml(projects) {
             if (index > -1) {
                 projects.splice(index, 1);
             }
-            projectItem.parentNode.removeChild(projectItem);
+            projectListToHtml(projects);
         });
 
         projectList.appendChild(projectItem);
