@@ -1,16 +1,16 @@
 import { sourceFileToVSCodeUrl } from '../utils/common.js';
 
 // Update createSourcePathLink to handle async
-async function createSourcePathLink(sourcePath) {
+async function createSourcePathLink(entry) {
     const link = document.createElement('a');
     try {
-        const vscodeUrl = await sourceFileToVSCodeUrl(sourcePath);
+        const vscodeUrl = await sourceFileToVSCodeUrl(entry.remotePath);
         link.href = vscodeUrl;
     } catch (error) {
         console.error('Error generating VS Code URL:', error);
         link.href = '#'; // Fallback in case of error
     }
-    link.textContent = sourcePath;
+    link.textContent = `${entry.repo} ${entry.remotePath}`;
     link.target = '_blank';
     return link;
 }
@@ -20,8 +20,8 @@ async function populateFilePaths(sourceFilePaths) {
     const fileList = document.getElementById('file-list');
     fileList.innerHTML = '';
 
-    for (const sourcePath of sourceFilePaths) {
-        const link = await createSourcePathLink(sourcePath);
+    for (const entry of sourceFilePaths) {
+        const link = await createSourcePathLink(entry);
         const listItem = document.createElement('li');
         listItem.appendChild(link);
         fileList.appendChild(listItem);
@@ -32,17 +32,19 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     const isShiftPressed = event.shiftKey;
 
     chrome.runtime.sendMessage({ action: 'getSourceFilePaths' }, async (response) => {
+        console.log(`Received source file paths from background script:`, response);
         if (response && response.sourceFilePaths && response.sourceFilePaths.length > 0) {
             await populateFilePaths(response.sourceFilePaths);
-            if (isShiftPressed) {
+
+            /* if (response.sourceFilePaths.length == 1) {
                 const firstSourcePath = response.sourceFilePaths[0];
                 try {
-                    const vscodeUrl = await sourceFileToVSCodeUrl(firstSourcePath);
+                    const vscodeUrl = await sourceFileToVSCodeUrl(firstSourcePath.remotePath);
                     window.open(vscodeUrl, '_blank');
                 } catch (error) {
                     console.error('Error opening first source path:', error);
                 }
-            }
+            } */
         }
     });
 });

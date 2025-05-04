@@ -3,6 +3,12 @@ import { sourceFileToLocalPath, sourceFileToVSCodeUrl, ensureDefaultSettings } f
 // Background script for handling extension events
 console.log('Background script loaded');
 
+chrome.runtime.onInstalled.addListener(async () => {
+    console.log('Extension installed or updated');
+    // Ensure default settings are set
+    await ensureDefaultSettings();
+});
+
 // Listen for messages from popup.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'getSourceFilePaths') {
@@ -32,49 +38,43 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Listen for the user clicking the extension button
-chrome.action.onClicked.addListener((tab) => {
-    console.log('Extension button clicked');
-
-    // Check if the Shift key is being held down
-    chrome.windows.getCurrent({ populate: true }, (window) => {
-        if (window.focused && window.type === 'normal') {
-            chrome.tabs.sendMessage(tab.id, { action: 'getSourceFilePaths' }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error('Error sending message to content script:', chrome.runtime.lastError);
-                } else if (response && response.sourceFilePaths) {
-                    console.log('Received source file paths from content script:', response.sourceFilePaths);
-                    if (response.sourceFilePaths.length > 0 && window.shiftKey) {
-                        // Open the first source file path in VS Code if Shift is held
-                        openInVSCode(tab, response.sourceFilePaths[0]);
-                    } else if (response.sourceFilePaths.length > 1) {
-                        // Open the popup to let the user choose a file
-                        chrome.action.openPopup();
-
-                        // Send the sourceFilePaths to the popup
-                        chrome.runtime.sendMessage({ action: 'setSourceFilePaths', sourceFilePaths: response.sourceFilePaths });
-                    } else {
-                        console.warn('No source file paths received from content script');
-                    }
-                } else {
-                    console.warn('No response or source file paths received from content script');
-                }
-            });
-        }
-    });
-});
+// chrome.action.onClicked.addListener((tab) => {
+//     console.log('Extension button clicked');
+// 
+//     // Check if the Shift key is being held down
+//     chrome.windows.getCurrent({ populate: true }, (window) => {
+//         if (window.focused && window.type === 'normal') {
+//             chrome.tabs.sendMessage(tab.id, { action: 'getSourceFilePaths' }, (response) => {
+//                 if (chrome.runtime.lastError) {
+//                     console.error('Error sending message to content script:', chrome.runtime.lastError);
+//                 } else if (response && response.sourceFilePaths) {
+//                     console.log('Received source file paths from content script:', response.sourceFilePaths);
+//                     if (response.sourceFilePaths.length > 0 && window.shiftKey) {
+//                         // Open the first source file path in VS Code if Shift is held
+//                         openInVSCode(tab, response.sourceFilePaths[0]);
+//                     } else if (response.sourceFilePaths.length > 1) {
+//                         // Open the popup to let the user choose a file
+//                         chrome.action.openPopup();
+// 
+//                         // Send the sourceFilePaths to the popup
+//                         chrome.runtime.sendMessage({ action: 'setSourceFilePaths', sourceFilePaths: response.sourceFilePaths });
+//                     } else {
+//                         console.warn('No source file paths received from content script');
+//                     }
+//                 } else {
+//                     console.warn('No response or source file paths received from content script');
+//                 }
+//             });
+//         }
+//     });
+// });
 
 // Update the usage of sourceFileToVSCodeUrl to handle async
-async function openInVSCode(tab, sourceFilePath) {
-    try {
-        const vscodeUrl = await sourceFileToVSCodeUrl(sourceFilePath);
-        chrome.tabs.create({ url: vscodeUrl });
-    } catch (error) {
-        console.error('Error generating VS Code URL:', error);
-    }
-}
-
-chrome.runtime.onInstalled.addListener(async () => {
-    console.log('Extension installed or updated');
-    // Ensure default settings are set
-    await ensureDefaultSettings();
-});
+// async function openInVSCode(tab, sourceFilePath) {
+//     try {
+//         const vscodeUrl = await sourceFileToVSCodeUrl(sourceFilePath);
+//         chrome.tabs.create({ url: vscodeUrl });
+//     } catch (error) {
+//         console.error('Error generating VS Code URL:', error);
+//     }
+// }
