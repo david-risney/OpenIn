@@ -1,0 +1,90 @@
+<script src="resources/testharness.js"></script>
+<script src="resources/testharnessreport.js"></script>
+<script>
+    // uses await style code to create a frame, attach it to the document, load the URL,
+    // wait for the URL to load and add removing the frame to the test shutdown.
+    function waitForDOMContentLoaded(d) {
+        const doc = d || document;
+        return new Promise((resolve) => {
+            if (doc.readyState === 'loading') {
+                doc.addEventListener('DOMContentLoaded', resolve);
+            } else {
+                // If DOMContentLoaded has already fired
+                resolve();
+            }
+        });
+    }
+
+    function loadFrameAsync(t, options) {
+        return new Promise(async (resolve, reject) => {
+            const frame = document.createElement('iframe');
+            frame.onerror = () => { reject(new Error(`Failed to load ${options.url}`)); };
+            frame.src = options.url;
+
+            t.add_cleanup(() => {
+                if (frame && document.body) {
+                    document.body.removeChild(frame);
+                }
+            });
+            document.body.appendChild(frame);
+            await waitForDOMContentLoaded(frame.contentDocument);
+            resolve(frame);
+        });
+    }
+
+    async function runFrameTest(t, options) {
+        await waitForDOMContentLoaded();
+
+        const frame = await loadFrameAsync(t, options); 
+
+        // Setup test hooks inside script in the frame
+        // window.test.location.href, .search and .host must be set to the test URL
+        // to make sure the test is run in the correct context.
+        frame.contentWindow.test = {};
+        frame.contentWindow.test.location = new URL(options.testLocation);
+
+        // Setup messaging to the frame
+        frame.contentWindow.test.chrome = {};
+        frame.contentWindow.test.chrome.runtime = {};
+        frame.contentWindow.test.chrome.runtime.onMessage = {};
+        const nextMessage = Promise.withResolvers();
+        frame.contentWindow.test.chrome.runtime.onMessage.addListener = (callback) => {
+            nextMessage.resolve(callback);
+        };
+
+        // Add content.js to the frame
+        {
+            const script = document.createElement("script");
+            const scriptLoad = Promise.withResolvers();
+            script.onload = () => { scriptLoad.resolve(); };
+            script.src = '../src/content/content.js';
+            frame.contentDocument.body.appendChild(script);
+            await scriptLoad.promise;
+        }
+
+        const messageCallback = await nextMessage.promise;
+        // callback is (message, sender, sendResponse) => { ... }
+        const receiveResolvers = Promise.withResolvers();
+        messageCallback({ action: 'getSourceFilePaths' }, {}, receiveResolvers.resolve);
+        const response = await receiveResolvers.promise;
+
+        // response.sourceFilePaths: [ {
+        //    title,
+        //    project,
+        //    repo,
+        //    remotePath
+        // }, ... ]
+
+        // options.expectedSourceFilePaths;
+        assert_array_equals(response.sourceFilePaths, options.expectedSourceFilePaths,
+            'source file paths match expected values');
+    }
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'resources/github-pr.html',
+            testLocation: 'https://github.com/eslint/rewrite/pull/195/files',
+            expectedSourceFilePaths: [ /* Add expected source file paths here */ ],
+        });
+    }, 'github pr files');
+</script>

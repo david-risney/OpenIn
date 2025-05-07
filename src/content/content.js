@@ -1,7 +1,14 @@
-// Example usage in content.js
 const console = window.console.context ? window.console.context('openin') : window.console;
-// const console = { log: () => {} }; // Disable logging
+// const console = { log: () => {}, error: () => {} }; // Disable logging
 console.log('Content script loaded');
+
+function getLocation() {
+    return window.test ? window.test.location : window.location;
+}
+
+function getChrome() {
+    return window.test ? window.test.chrome : window.chrome;
+}
 
 // Does a series of selectors with each one running on the results of the previous.
 // Additionally if the element is a shadow root then the next selector runs on the shadow root document.
@@ -89,6 +96,7 @@ const mapping = {
     //       https://{organization}.azure.com
     //          Search: /{Project}/_search?result=x/y/{Repo}/{branch/commit}//{sourcePath}
     //          Explore: /{Project}/_git/{Repo}?path=/{sourcePath}&version={branch/commit}
+    //          PR: ...
     "dev.azure.com": [
         {
             "title": {"literal": "Azure DevOps search results"},
@@ -107,6 +115,7 @@ const mapping = {
     // GitHub:
     //       Explore: https://github.com/{User}/{Repo}/blob/{branch/commit}/{sourcePath}
     //       Search:  https://github.com/search?q=repo%3Adavid-risney%2FPwshProfile%20cmdletbinding&type=code, *[data-testid = link-to-search-result] .textContent
+    //       PR: https://github.com/eslint/rewrite/pull/195/files, a.Link--primary, title attribute
     "github.com": [
         {
             "title": {"literal": "GitHub file view"},
@@ -114,15 +123,29 @@ const mapping = {
             "repo": {"urlpattern": { "pathname": "/:project/:repo/*" }},
             "remotePath": {"urlpattern": { "pathname": "/:project/:repo/blob/:commit/:remotePath+" }}
         },
+        /* // Disabling for now. Need to get the user and repo out of the URLs.
         {
             "title": {"literal": "GitHub search results"},
-            "project": {"urlpattern": { "pathname": "/:user/:repo/*" }},
-            "repo": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)" }},
+            "project": {"urlquery": { "q": "repo%3A(?<project>.*)%2F(?<repo>.*)%20" }},
+            "repo": {"urlquery": { "q": "repo%3A(?<project>.*)%2F(?<repo>.*)%20" }},
             "remotePath": {
                 "html": {
                     "groupSelectors": ['*[data-testid = link-to-search-result]'],
                     "remotePathSelector": null,
                     "remotePathValuePath": {"kind": "textContent"}
+                }
+            }
+        },
+        */
+        {
+            "title": {"literal": "GitHub pull request"},
+            "project": {"urlpattern": { "pathname": "/:user/:repo/pull/*" }},
+            "repo": {"urlpattern": { "pathname": "/:user/:repo/pull/*" }},
+            "remotePath": {
+                "html": {
+                    "groupSelectors": ['a.Link--primary'],
+                    "remotePathSelector": null,
+                    "remotePathValuePath": {"kind": "attribute", "path": "title"}
                 }
             }
         }
@@ -131,7 +154,7 @@ const mapping = {
 
 function getUrlPatternValue(valueName, urlPatternOptions) {
     const urlPattern = new URLPattern(urlPatternOptions);
-    const result = urlPattern.exec(document.location.href);
+    const result = urlPattern.exec(getLocation().href);
     if (result) {
         const group = result.pathname.groups[valueName];
         return decodeURI(group);
@@ -144,13 +167,13 @@ function getUrlQueryValue(valueName, urlQueryOptions) {
     // 'result' is the name of the key of the keyvalues in the url.search and the regex is used to parse its value.
     // The valueName is used as the name of the matched group of the regex.
     // The url is the url to parse.
-    const urlQuery = new URLSearchParams(document.location.search);
+    const urlQuery = new URLSearchParams(getLocation().search);
     const urlQueryKeyName = Object.getOwnPropertyNames(urlQueryOptions)[0];
     const urlQueryKeyValue = urlQuery.get(urlQueryKeyName)
 
     const regex = new RegExp(urlQueryOptions[urlQueryKeyName]);
     const match = regex.exec(urlQueryKeyValue);
-    console.log(`Parsing URL query with options:`, document.location.search, urlQueryOptions, urlQueryKeyName, urlQueryKeyValue, regex, match);
+    console.log(`Parsing URL query with options:`, getLocation().search, urlQueryOptions, urlQueryKeyName, urlQueryKeyValue, regex, match);
     return (match && match.groups) ? decodeURI(match.groups[valueName]) : null;
 }
 
@@ -169,13 +192,20 @@ function getHtmlValue(valueName, htmlOptions) {
         if (remotePath) {
             switch (htmlOptions.remotePathValuePath.kind) {
                 case "textContent":
-                    remotePathValue = remotePath.textContent.trim();
+                    remotePathValue = remotePath.textContent;
+                    if (remotePathValue) {
+                        remotePathValue = remotePathValue.trim();
+                    }
                     break;
                 case "attribute":
-                    remotePathValue = remotePath.getAttribute(htmlOptions.remotePathValuePath.path).trim();
+                    remotePathValue = remotePath.getAttribute(htmlOptions.remotePathValuePath.path);
+                    if (remotePathValue) {
+                        remotePathValue = remotePathValue.trim();
+                    }
                     break;
                 default:
                     console.error(`Unknown remote path value path kind: ${htmlOptions.remotePathValuePath.kind}`);
+                    break;
             }
         }
         if (remotePathValue == "Commit message") {
@@ -201,7 +231,7 @@ function resolveValue(valueName, options) {
 
 function getSourceFiles() {
     let sourceFiles = [];
-    const currentHost = window.location.host;
+    const currentHost = getLocation().host;
     const currentMappings = mapping[currentHost];
 
     if (currentMappings && currentMappings.length > 0) {
@@ -234,7 +264,7 @@ function getSourceFiles() {
 }
 
 // Listen for messages from the background script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+getChrome().runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.action) {
         case 'getSourceFilePaths': {
             console.log('Received request for source file paths from background script');
