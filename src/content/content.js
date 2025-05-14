@@ -99,17 +99,23 @@ const mapping = {
     //          PR: ...
     "dev.azure.com": [
         {
-            "title": {"literal": "Azure DevOps search results"},
-            "project": {"urlpattern": { "pathname": "/:org/:project/*" }},
-            "repo": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)" }},
-            "remotePath": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)/[^/]+//(?<remotePath>.*)" }}
-        },
-        {
-            "title": {"literal": "Azure DevOps file view"},
+            "title": {"literal": "Azure DevOps explorer file view"},
             "project": {"urlpattern": { "pathname": "/:org/:project/*" }},
             "repo": {"urlpattern": { "pathname": "/:org/:project/_git/:repo" }},
             "remotePath": {"urlquery": { "path": "/(?<remotePath>.*)" }}
-        }
+        },
+        {
+            "title": {"literal": "Azure DevOps PR file view"},
+            "project": {"urlpattern": { "pathname": "/:org/:project/*" }},
+            "repo": {"urlpattern": { "pathname": "/:org/:project/_git/:repo/pullrequest/*" }},
+            "remotePath": {"urlquery": { "path": "/(?<remotePath>.*)" }}
+        },
+        {
+            "title": {"literal": "Azure DevOps search results"},
+            "project": {"urlpattern": { "pathname": "/:org/:project/_search" }},
+            "repo": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)" }},
+            "remotePath": {"urlquery": { "result": "[^/]+/[^/]+/(?<repo>[^/]+)/[^/]+//(?<remotePath>.*)" }}
+        },
     ],
 
     // GitHub:
@@ -246,6 +252,9 @@ function getSourceFiles() {
                 remotePaths = [remotePaths];
             }
 
+            if (!title || !project || !repo || remotePaths.length == 0) {
+                return;
+            }
             const entries = remotePaths.map(remotePath => { return {
                     title,
                     project,

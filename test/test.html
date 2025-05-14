@@ -111,13 +111,24 @@
         });
     }, 'github pr files');
 
+    // Currently disabled GitHub search results page. Not easy to implement and perhaps not worth the effort.
+    // promise_test(async t => {
+    //     await runFrameTest(t, {
+    //         url: 'data/github-search.html',
+    //         testLocation: 'https://github.com/search?q=repo%3Aweb-platform-tests%2Fwpt%20assert_equals&type=code',
+    //         expectedSourceFilePaths: [],
+    //     });
+    // }, 'github search');
+
     promise_test(async t => {
         await runFrameTest(t, {
-            url: 'data/github-search.html',
-            testLocation: 'https://github.com/search?q=repo%3Aweb-platform-tests%2Fwpt%20assert_equals&type=code',
-            expectedSourceFilePaths: [], // This is a bug.
+            url: 'data/github-explore.html',
+            testLocation: 'https://github.com/david-risney/OpenIn/blob/main/design.md',
+            expectedSourceFilePaths: [
+                {"title":"GitHub file view","project":"david-risney","repo":"OpenIn","remotePath":"design.md"},
+            ],
         });
-    }, 'github search');
+    }, 'github explore');
 
     promise_test(async t => {
         await runFrameTest(t, {
@@ -172,6 +183,36 @@
             ],
         });
     }, 'chromium search page');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/blank.html',
+            testLocation: 'https://dev.azure.com/a/b/_git/c/pullrequest/12345?_a=files&path=/content/browser/renderer_host/render_process_host_impl.cc',
+            expectedSourceFilePaths: [
+                {"title":"Azure DevOps PR file view","project":"b","repo":"c","remotePath":"content/browser/renderer_host/render_process_host_impl.cc"}
+            ],
+        });
+    }, 'ADO PR file page');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/blank.html',
+            testLocation: 'https://dev.azure.com/a/b/_git/c?path=%2Fcontent%2Fbrowser%2Frenderer_host%2Frender_process_host_impl.cc&version=GBd%2Fe%2Ff',
+            expectedSourceFilePaths: [
+                {"title":"Azure DevOps explorer file view","project":"b","repo":"c","remotePath":"content/browser/renderer_host/render_process_host_impl.cc"}
+            ],
+        });
+    }, 'ADO explore file page');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/blank.html',
+            testLocation: 'https://dev.azure.com/a/b/_search?action=contents&text=createuri&type=code&lp=code-Project&filters=c&pageSize=25&includeFacets=false&result=DefaultCollection/b/c/GBmain//d/browser/e/win/f.cc',
+            expectedSourceFilePaths: [
+                {"title":"Azure DevOps search results","project":"b","repo":"c","remotePath":"d/browser/e/win/f.cc"}
+            ],
+        });
+    }, 'ADO search page');
 
     // Disabling this test because the page depends heavily on web components and its hard to
     // create a snapshot of the HTML.
