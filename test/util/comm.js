@@ -8,7 +8,7 @@ console.log('test/comm.js loaded');
 // the parent window.
 // 3. The parent window will send a message back of the fake URI to set
 
-window.test = {};
+window.openSourceInTest = {};
 
 // Setup message event
 // Valid messages:
@@ -21,7 +21,7 @@ window.addEventListener('message', function(event) {
   switch (message.type) {
     case 'ready': {
       console.log('Iframe is ready');
-      test.location = new URL(message.uri);
+      openSourceInTest.location = new URL(message.uri);
       break;
     }
 
@@ -41,12 +41,12 @@ window.addEventListener('message', function(event) {
   }
 });
 
-test.chrome = {};
-test.chrome.runtime = {};
-test.chrome.runtime.onMessage = {};
+openSourceInTest.chrome = {};
+openSourceInTest.chrome.runtime = {};
+openSourceInTest.chrome.runtime.onMessage = {};
 // callback is (message, sender, sendResponse) => { ... }
 let onMessageCallback = () => {};
-test.chrome.runtime.onMessage.addListener = (callback) => {
+openSourceInTest.chrome.runtime.onMessage.addListener = (callback) => {
     onMessageCallback = callback;
 };
 

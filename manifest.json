@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "OpenIn Browser Extension",
+  "name": "OpenSourceIn",
   "version": "1.0",
-  "description": "Enhance developer productivity by adding an 'Open in VS Code' button to source code pages.",
+  "description": "Enhance developer productivity by adding an 'Open in VS Code' button to source code pages in the browser.",
   "permissions": ["storage", "activeTab"],
   "background": {
     "service_worker": "src/background/background.js",

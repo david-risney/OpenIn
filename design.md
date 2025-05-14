@@ -1,8 +1,8 @@
-# Design Document for OpenIn Browser Extension
+# Design Document for OpenSourceIn Browser Extension
 
 ## Overview
 
-The OpenIn browser extension is designed to enhance developer productivity by adding an 'Open in VS Code' button to source code pages on specific websites. This button allows users to open the corresponding local file in VS Code. The extension supports Edge and Chrome browsers and uses the latest extension manifest version (Manifest V3).
+The OpenSourceIn browser extension is designed to enhance developer productivity by adding an 'Open in VS Code' button to source code pages on specific websites. This button allows users to open the corresponding local file in VS Code. The extension supports Edge and Chrome browsers and uses the latest extension manifest version (Manifest V3).
 
 ## Features
 - Adds 'Open in VS Code' buttons to pages displaying source code from:
@@ -19,7 +19,7 @@ The OpenIn browser extension is designed to enhance developer productivity by ad
 
 ## Folder Structure
 ```
-OpenIn/
+OpenSourceIn/
 ├── src/
 │   ├── background/
 │   │   └── background.js       # Background script for handling extension events

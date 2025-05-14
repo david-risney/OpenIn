@@ -20,3 +20,5 @@ coverage/
 web-ext-artifacts/
 
 test/data/
+
+extension.zip
