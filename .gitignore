@@ -18,3 +18,5 @@ dist/
 coverage/
 
 web-ext-artifacts/
+
+test/data/
