@@ -1,0 +1,79 @@
+html {
+    height: 400px;
+    width: 600px; 
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+body {
+    display: grid;
+    grid-template-areas:
+        "title settings"
+        "list list";
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr auto;
+    height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    grid-area: title;
+    text-align: center;
+    background-color: #0078d7;
+    color: white;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#settings-button {
+    grid-area: settings;
+    align-self: center;
+    justify-self: center;
+    background-color: #0078d7;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#settings-button:hover {
+    background-color: #005a9e;
+}
+
+ul {
+    grid-area: list;
+    margin: 0;
+    padding: 10px;
+    overflow-y: auto;
+    list-style-type: none;
+}
+
+li {
+    font-size: 16px; /* Slightly larger text */
+    font-family: Consolas, monospace; /* Consolas font */
+    margin: 5px 0;
+}
+
+li::before {
+    content: '\1F517'; /* Share or open icon emoji */
+    margin-right: 8px;
+}
+
+a {
+    text-decoration: none;
+    color: #0078d7;
+}
+
+li a:hover {
+    text-decoration: underline;
+}

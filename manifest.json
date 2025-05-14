@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "OpenIn Browser Extension",
+  "version": "1.0",
+  "description": "Enhance developer productivity by adding an 'Open in VS Code' button to source code pages.",
+  "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://dev.azure.com/*",
+        "https://source.chromium.org/chromium/*",
+        "https://issues.chromium.org/*",
+        "https://chromium-review.googlesource.com/*",
+        "https://source.chromium.org/*",
+        "https://github.com/*"
+      ],
+      "js": ["src/content/content.js"]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.light.png",
+      "48": "icons/icon48.light.png",
+      "128": "icons/icon128.light.png"
+    },
+    "default_popup": "src/popup/popup.html"
+  },
+  "options_page": "src/options/options.html",
+  "icons": {
+    "16": "icons/icon16.light.png",
+    "48": "icons/icon48.light.png",
+    "128": "icons/icon128.light.png"
+  }
+}

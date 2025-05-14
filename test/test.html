@@ -1,0 +1,186 @@
+<script src="util/testharness.js"></script>
+<script src="util/testharnessreport.js"></script>
+<script>
+    // uses await style code to create a frame, attach it to the document, load the URL,
+    // wait for the URL to load and add removing the frame to the test shutdown.
+    function waitForDOMContentLoaded(d) {
+        const doc = d || document;
+        return new Promise((resolve) => {
+            if (doc.readyState === 'loading') {
+                doc.addEventListener('DOMContentLoaded', resolve);
+            } else {
+                // If DOMContentLoaded has already fired
+                resolve();
+            }
+        });
+    }
+
+    function loadFrameAsync(t, options) {
+        return new Promise(async (resolve, reject) => {
+            const frame = document.createElement('iframe');
+            frame.onerror = () => { reject(new Error(`Failed to load ${options.url}`)); };
+            frame.onload = () => { resolve(frame); };
+            frame.src = options.url;
+
+            t.add_cleanup(() => {
+                if (frame && document.body) {
+                    document.body.removeChild(frame);
+                }
+            });
+            document.body.appendChild(frame);
+        });
+    }
+
+    async function loadScriptInFrame(frame, scriptSrc) {
+        return new Promise((resolve, reject) => {
+            const script = frame.contentDocument.createElement('script');
+            script.onload = () => { resolve(); };
+            script.onerror = () => { reject(new Error(`Failed to load script: ${scriptSrc}`)); };
+            script.src = scriptSrc;
+            frame.contentDocument.body.appendChild(script);
+        });
+    }
+
+    async function nextMessageFromFrame(frame) {
+        return new Promise((resolve) => {
+            window.addEventListener('message', (event) => {
+                if (event.source !== frame.contentWindow) {
+                    return;
+                }
+                resolve(event.data);
+            });
+        });
+    }
+
+    async function runFrameTest(t, options) {
+        await waitForDOMContentLoaded();
+
+        const frame = await loadFrameAsync(t, options); 
+        await waitForDOMContentLoaded(frame.contentDocument);
+
+        // Add util/comm.js to the frame to handle test overrides and
+        // test communication with the main test page.
+        await loadScriptInFrame(frame, '../util/comm.js');
+
+        // Add content.js to the frame to test it.
+        await loadScriptInFrame(frame, '../../src/content/content.js');
+
+        // Post message into the frame that we're ready and include the test uri
+        //  { type: 'ready', uri: 'https://example.com' }
+        frame.contentWindow.postMessage({
+            type: 'ready',
+            uri: options.testLocation,
+        }, '*');
+
+        // promise for the next message from the frame
+        const messagePromise = nextMessageFromFrame(frame);
+
+        //  { type: 'runtimeMessage', message: { ... } }
+        frame.contentWindow.postMessage({
+            type: 'runtimeMessage',
+            message: {
+                action: 'getSourceFilePaths',
+            },
+        }, '*');
+
+        const response = (await messagePromise).message;
+
+        // response.sourceFilePaths: [ {
+        //    title,
+        //    project,
+        //    repo,
+        //    remotePath
+        // }, ... ]
+
+        // options.expectedSourceFilePaths;
+        assert_equals(
+            JSON.stringify(response.sourceFilePaths), 
+            JSON.stringify(options.expectedSourceFilePaths),
+            'source file paths match expected values');
+    }
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/github-pr.html',
+            testLocation: 'https://github.com/web-platform-tests/wpt/pull/52535/files',
+            expectedSourceFilePaths: [
+                {"title":"GitHub pull request","project":"undefined","repo":"wpt","remotePath":"html/semantics/forms/the-datalist-element/WEB_FEATURES.yml"},
+                {"title":"GitHub pull request","project":"undefined","repo":"wpt","remotePath":"html/semantics/forms/the-meter-element/WEB_FEATURES.yml"},
+                {"title":"GitHub pull request","project":"undefined","repo":"wpt","remotePath":"html/semantics/forms/the-progress-element/WEB_FEATURES.yml"},
+            ],
+        });
+    }, 'github pr files');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/github-search.html',
+            testLocation: 'https://github.com/search?q=repo%3Aweb-platform-tests%2Fwpt%20assert_equals&type=code',
+            expectedSourceFilePaths: [], // This is a bug.
+        });
+    }, 'github search');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/chromium-search-list.html',
+            testLocation: 'https://source.chromium.org/search?q=createuri&sq=&ss=chromium',
+            expectedSourceFilePaths: [
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/nearby/src/internal/platform/implementation/windows/generated/winrt/impl/Windows.Foundation.0.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/webshare/win/fake_uri_runtime_class_factory.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/xla/tsl/platform/file_system.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/third_party/tsl/tsl/platform/path.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/third_party/tsl/tsl/platform/path.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/perl/c/i686-w64-mingw32/include/urlmon.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/devtools-frontend/src/node_modules/socket.io/client-dist/socket.io.js"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/devtools-frontend/src/node_modules/socket.io/client-dist/socket.io.esm.min.js"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/nearby/src/internal/platform/implementation/windows/generated/winrt/Windows.Foundation.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/webshare/win/fake_uri_runtime_class_factory_unittest.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/libxml/src/uri.c"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/webshare/win/fake_uri_runtime_class_factory.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/tensorflow/core/platform/path.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/xla/tsl/platform/file_system.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/libxml/src/testapi.c"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"services/device/public/cpp/geolocation/system_geolocation_source_win.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/webshare/win/share_operation.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/third_party/tsl/tsl/platform/path_test.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Com/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/webshare/win/fake_data_transfer_manager_unittest.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"chrome/browser/permissions/system/system_media_source_win.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/angle/third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Com/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/dawn/third_party/angle/third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Com/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/perl/c/include/libxml/uri.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"content/browser/installedapp/native_win_app_fetcher_impl.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/libxslt/src/libxslt/security.c"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/libxml/src/include/libxml/uri.h"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/tflite/src/third_party/xla/xla/tsl/platform/env.cc"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Js/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/angle/third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Js/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/libxml/src/runtest.c"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/dawn/third_party/angle/third_party/rust/chromium_crates_io/vendor/windows-sys-v0_52/src/Windows/Win32/System/Js/mod.rs"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/devtools-frontend/src/node_modules/socket.io/client-dist/socket.io.min.js"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"third_party/devtools-frontend/src/node_modules/socket.io/client-dist/socket.io.msgpack.min.js"},
+                {"title":"Google Code search results list","project":"Chromium","repo":"Chromium","remotePath":"services/device/nfc/android/java/src/org/chromium/device/nfc/NdefMessageUtils.java"},
+            ],
+        });
+    }, 'chromium search list');
+
+    promise_test(async t => {
+        await runFrameTest(t, {
+            url: 'data/chromium-search-page.html',
+            testLocation: 'https://source.chromium.org/chromium/chromium/src/+/main:third_party/nearby/src/internal/platform/implementation/windows/generated/winrt/impl/Windows.Foundation.0.h?q=createuri&ss=chromium',
+            expectedSourceFilePaths: [
+                {"title":"Google Code search result page","project":"Chromium","repo":"Chromium","remotePath":"third_party/nearby/src/internal/platform/implementation/windows/generated/winrt/impl/Windows.Foundation.0.h"}
+            ],
+        });
+    }, 'chromium search page');
+
+    // Disabling this test because the page depends heavily on web components and its hard to
+    // create a snapshot of the HTML.
+    // promise_test(async t => {
+    //     await runFrameTest(t, {
+    //         url: 'data/chromium-review-list.html',
+    //         testLocation: 'https://chromium-review.googlesource.com/c/chromium/src/+/6249202',
+    //         expectedSourceFilePaths: [
+    //         ],
+    //     });
+    // }, 'chromium review list');
+</script>

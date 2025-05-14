@@ -1,0 +1,20 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE specific files
+.vscode/
+
+# Test coverage
+coverage/
+
+web-ext-artifacts/
