@@ -7,11 +7,10 @@ It works in Edge and Chrome.
 ## Setup
 
 1. Install the extension from your browser's extension store.
-2. Open the options page by right-clicking the extension icon in the toolbar and selecting `Options`.
-   - If you only plan to use the extension with a single project, you can set the `Default Local Path` to the root folder of your project, and press `Save`. This will be used as the base folder for all file mappings.
+2. This will open the options page and let you set your local paths: 
+   - If you only plan to use the extension with a single project, you can set the `Default Local Path` to the root folder of your project. This will be used as the base folder for all file mappings.
    - If you have multiple projects, you can add a new mapping for each project. You can either do this manually by pressing the `Add Project` button for each project or you can open tabs to the different projects you want to map and then press the `Auto Add Projects From Tabs` button. In either case, you need to set the `Local File Path` for each project listing.
-3. Press the `Save` button to save your changes to the options.
-4. Reload any tab you want to use the extension with that was open before installing the extension.
+3. Reload any tab you want to use the extension with that was open before installing the extension.
 
 ## Usage
 
@@ -27,4 +26,3 @@ To use the extension, click the extension icon in the toolbar. This will open a 
     - `{localPath}`: The local path to the file. This is the path that will be used to open the file in the editor.
 
 - **Auto Open Single File**: If this is checked (the default) then if there is only one file found on the current page, it will automatically open that file in the editor. If this is not checked, you will need to select the file from the list of files before it will open.
-- **Save**: Press this button to save your changes. If you don't press this button, your changes will not be saved.

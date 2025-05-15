@@ -60,11 +60,6 @@ export async function ensureDefaultSettings() {
     if (!items.customUrlTemplate) {
         await chrome.storage.sync.set({ customUrlTemplate: 'vscode://file/{localPath}' });
     }
-    if (!items.projects) {
-        await chrome.storage.sync.set({ projects: [
-            { project: 'Chromium', repo: 'Chromium', localPath: 'Q:\\cr\\src' }
-        ] });
-    }
     if (!items.autoOpenSingleFile) {
         await chrome.storage.sync.set({ autoOpenSingleFile: true });
     }

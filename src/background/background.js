@@ -3,10 +3,16 @@ import { ensureDefaultSettings } from '../utils/common.js';
 // Background script for handling extension events
 console.log('Background script loaded');
 
-chrome.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(async (details) => {
     console.log('Extension installed or updated');
+
     // Ensure default settings are set
     await ensureDefaultSettings();
+
+    // Open the options page in a new tab if the extension is newly installed
+    if (details.reason === 'install') {
+        chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html') });
+    }
 });
 
 // Listen for messages from popup.js
