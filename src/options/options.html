@@ -22,15 +22,6 @@
 <body>
   <h1>OpenInSource Options</h1>
 
-  <h2>Projects</h2>
-  <ol id="project-list"></ol>
-
-  <button type="button" id="add-project-button">Add Project</button>
-  <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
-  <hr>
-
-  <h2>Defaults</h2>
-
   <label for="default-local-path">Default Local Path:</label>
   <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
 
@@ -41,6 +32,14 @@
   <input type="checkbox" id="auto-open-single-file" checked />
   <label for="auto-open-single-file">Auto Open Single File</label>
   </div>
+
+  <h2>Projects</h2>
+  <ol id="project-list"></ol>
+
+  <button type="button" id="add-project-button">Add Project</button>
+  <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
+  <hr>
+
   <button id="save-button" type="submit">Save</button>
   <script type="module" src="options.js"></script>
 </body>
