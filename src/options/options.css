@@ -9,10 +9,11 @@ html, body {
 
 body {
     display: grid;
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
     grid-template-columns: 16px 1fr 16px;
     grid-template-areas: 
         " title title title "
+        ". welcome ."
         ". general-options ."
         ". projects-options .";
 }
@@ -53,18 +54,26 @@ h1 {
     height: 100%;
 }
 
-#general-options {
-    grid-area: general-options;
+p {
+    border: 0;
+    padding: 0;
+    margin: 0;
 }
 
-#projects-options {
-    grid-area: projects-options;
-}
+hr {width: 100%;}
 
-#general-options, #projects-options {
+#general-options { grid-area: general-options; }
+#projects-options { grid-area: projects-options; }
+#first-run { grid-area: welcome; }
+
+.flex-down {
     display: flex;
     flex-direction: column;
     gap: 8px;
     height: 100%;
     width: 100%;
+}
+
+.first-run-hidden {
+    display: none;
 }

@@ -136,3 +136,7 @@ function attachSaveOnChange() {
 
 restoreOptions();
 attachSaveOnChange();
+
+if (location.search.includes('first-run')) {
+    document.getElementById('first-run').classList.remove('first-run-hidden');
+}

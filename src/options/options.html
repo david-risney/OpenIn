@@ -22,7 +22,18 @@
 <body>
   <h1>OpenSourceIn Options</h1>
 
-  <section id="general-options">
+  <section id="first-run" class="first-run-hidden flex-down">
+    <h2>Welcome!</h2>
+    <p>To get started:</p>
+    <ul>
+    <li>Fill in your <b><code>Default Local Path</code></b> below.
+    <li>Or if you have multiple projects, open tabs to one example of their source files, and then press the <b><code>Auto Add Projects From Tabs</code></b> button and then fill in the <b><code>Local Path</code></b> for each project added.
+    </ul>
+    <p><b>NOTE:</b> Any tabs opened before installing OpenSourceIn will need to be reloaded to work with OpenSourceIn!</p>
+    <hr/>
+  </section>
+
+  <section id="general-options" class="flex-down">
     <label for="default-local-path">Default Local Path:</label>
     <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
 
@@ -35,7 +46,7 @@
     </div>
   </section>
 
-  <section id="projects-options">
+  <section id="projects-options" class="flex-down">
     <h2>Projects</h2>
     <ol id="project-list"></ol>
 

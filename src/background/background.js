@@ -11,7 +11,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
     // Open the options page in a new tab if the extension is newly installed
     if (details.reason === 'install') {
-        chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html') });
+        chrome.tabs.create({ url: chrome.runtime.getURL('options/options.html') + '?first-run' });
     }
 });
 
