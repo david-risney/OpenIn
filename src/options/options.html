@@ -22,25 +22,27 @@
 <body>
   <h1>OpenInSource Options</h1>
 
-  <label for="default-local-path">Default Local Path:</label>
-  <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
+  <section id="general-options">
+    <label for="default-local-path">Default Local Path:</label>
+    <input type="text" id="default-local-path" placeholder="e.g., C:/Projects" />
 
-  <label for="custom-url-template">Custom URL Template:</label>
-  <input type="text" id="custom-url-template" placeholder="e.g., vscode://file/{localSourceFilePath}" />
+    <label for="custom-url-template">Custom URL Template:</label>
+    <input type="text" id="custom-url-template" placeholder="e.g., vscode://file/{localSourceFilePath}" />
 
-  <div>
-  <input type="checkbox" id="auto-open-single-file" checked />
-  <label for="auto-open-single-file">Auto Open Single File</label>
-  </div>
+    <div>
+      <input type="checkbox" id="auto-open-single-file" checked />
+      <label for="auto-open-single-file">Auto Open Single File</label>
+    </div>
+  </section>
 
-  <h2>Projects</h2>
-  <ol id="project-list"></ol>
+  <section id="projects-options">
+    <h2>Projects</h2>
+    <ol id="project-list"></ol>
 
-  <button type="button" id="add-project-button">Add Project</button>
-  <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
-  <hr>
+    <button type="button" id="add-project-button">Add Project</button>
+    <button type="button" id="auto-add-projects-from-tabs">Auto Add Projects From Tabs</button>
+  </section>
 
-  <button id="save-button" type="submit">Save</button>
   <script type="module" src="options.js"></script>
 </body>
 </html>

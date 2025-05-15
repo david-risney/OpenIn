@@ -5,16 +5,20 @@ const projects = [];
 // JavaScript for the options/settings page
 // Save options to Chrome storage
 async function saveOptions(event) {
-    event.preventDefault();
+    if (event) {
+        event.preventDefault();
+    }
 
     const defaultLocalPath = document.getElementById('default-local-path').value;
     const customUrlTemplate = document.getElementById('custom-url-template').value;
     const autoOpenSingleFile = !!document.getElementById('auto-open-single-file').checked;
 
+    const h1 = document.getElementsByTagName("h1")[0];
+    h1.textContent = "Saving...";
+    setTimeout(() => { h1.textContent = "OpenInSource Options"; }, 1000);
+
     await setSettings({ defaultLocalPath, customUrlTemplate, projects, autoOpenSingleFile });
-    alert('Options saved successfully!');
 }
-document.getElementById('save-button').addEventListener('click', saveOptions);
 
 // projects is an array of project objects:
 // [ { project: 'Project Name', repo: 'Repo Name', localPath: 'C:/path/to/project1' } ]
@@ -32,15 +36,15 @@ function projectListToHtml(projects) {
         const projectItem = projectTemplate.content.cloneNode(true);
         let e = projectItem.querySelector('.project-name');
         e.value = project.project;
-        e.addEventListener('change', () => { project.project = e.value; });
+        e.addEventListener('change', () => { project.project = e.value; saveOptions(); });
 
         e = projectItem.querySelector('.repo-name');
         e.value = project.repo;
-        e.addEventListener('change', () => { project.repo = e.value; });
+        e.addEventListener('change', () => { project.repo = e.value; saveOptions(); });
 
         e = projectItem.querySelector('.local-path');
         e.value = project.localPath;
-        e.addEventListener('change', () => { project.localPath = e.value; });
+        e.addEventListener('change', () => { project.localPath = e.value; saveOptions(); });
 
         projectItem.querySelector('.remove-project-button').addEventListener('click', () => {
             const index = projects.indexOf(project);
@@ -48,6 +52,7 @@ function projectListToHtml(projects) {
                 projects.splice(index, 1);
             }
             projectListToHtml(projects);
+            saveOptions();
         });
 
         projectList.appendChild(projectItem);
@@ -61,6 +66,7 @@ async function addProject() {
 
     projects.push({ project, repo, localPath });
     projectListToHtml(projects);
+    saveOptions();
 }
 document.getElementById('add-project-button').addEventListener('click', addProject);
 
@@ -116,4 +122,17 @@ async function restoreOptions() {
         projectListToHtml(projects);
     }
 }
-document.addEventListener('DOMContentLoaded', restoreOptions);
+
+// Attach event listeners to call saveOptions on UI changes
+function attachSaveOnChange() {
+    document.getElementById('default-local-path').addEventListener('input', saveOptions);
+    document.getElementById('custom-url-template').addEventListener('input', saveOptions);
+    document.getElementById('auto-open-single-file').addEventListener('change', saveOptions);
+
+    const projectList = document.getElementById('project-list');
+    projectList.addEventListener('input', saveOptions);
+    projectList.addEventListener('change', saveOptions);
+}
+
+restoreOptions();
+attachSaveOnChange();

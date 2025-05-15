@@ -1,7 +1,20 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background-color: #e8e8e8;
+}
+
 body {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+    grid-template-columns: 16px 1fr 16px;
+    grid-template-areas: 
+        " title title title "
+        ". general-options ."
+        ". projects-options .";
 }
 
 label {
@@ -27,6 +40,31 @@ button:hover {
     background-color: #005a9e;
 }
 
-#project-list {
-    border: 1px solid #ccc;
+/* Assign grid areas */
+h1 {
+    grid-area: title;
+    text-align: center;
+    background-color: #0078d7;
+    color: white;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#general-options {
+    grid-area: general-options;
+}
+
+#projects-options {
+    grid-area: projects-options;
+}
+
+#general-options, #projects-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: 100%;
+    width: 100%;
 }
