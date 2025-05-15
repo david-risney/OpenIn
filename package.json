@@ -10,7 +10,7 @@
     "format": "prettier --write src/**/*.js",
     "try:edge": "start msedge --argumentlist \"--load-extension=$($pwd.Path)\"",
     "package:crx": "web-ext build --overwrite-dest",
-    "zip": "zip -r extension.zip icons src manifest.json -x \"test/*\" \".git/*\" \".gitignore\" \"package.json\" \"*.md\""
+    "zip": "cd src && zip -r ../extension.zip *"
   },
   "repository": {
     "type": "git",

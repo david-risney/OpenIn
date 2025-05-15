@@ -26,3 +26,7 @@ To use the extension, click the extension icon in the toolbar. This will open a 
     - `{localPath}`: The local path to the file. This is the path that will be used to open the file in the editor.
 
 - **Auto Open Single File**: If this is checked (the default) then if there is only one file found on the current page, it will automatically open that file in the editor. If this is not checked, you will need to select the file from the list of files before it will open.
+
+## Privacy Policy
+
+This extension does not collect any personal data. It only stores the local paths you provide and other similar options in the browser's local storage. The extension does not send any data to a server or third party. The extension only interacts with the files you open in your browser and launches your editor.
