@@ -15,7 +15,7 @@ async function saveOptions(event) {
 
     const h1 = document.getElementsByTagName("h1")[0];
     h1.textContent = "Saving...";
-    setTimeout(() => { h1.textContent = "OpenInSource Options"; }, 1000);
+    setTimeout(() => { h1.textContent = "OpenSourceIn Options"; }, 1000);
 
     await setSettings({ defaultLocalPath, customUrlTemplate, projects, autoOpenSingleFile });
 }
