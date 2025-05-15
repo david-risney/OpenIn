@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "OpenSourceIn",
   "version": "1.0",
-  "description": "Enhance developer productivity by adding an 'Open in VS Code' button to source code pages in the browser.",
+  "description": "Open source code from your browser to VS Code",
   "permissions": ["storage", "activeTab"],
   "background": {
     "service_worker": "src/background/background.js",
